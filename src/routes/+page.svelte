@@ -3,14 +3,18 @@
 
 	let playerToAdd = $state('')
 
-	const addNewPlayer = (e) => {
+	const addNewPlayer = (e: Event) => {
 		e.preventDefault()
-		game.players = [...game.players, { name: playerToAdd, banked: 0, rolled: 0 }]
+		game.createNewPlayer(playerToAdd)
 		playerToAdd = ''
 	}
 
-	const startGame = () => {
-		// game.started = true
+	const gameCanStart = $derived(game.players.length >= 2)
+
+	const startGame = (e: Event) => {
+		if (!gameCanStart) {
+			e.preventDefault()
+		}
 	}
 </script>
 
@@ -30,15 +34,12 @@
 	{:else}
 		<ul>
 			{#each game.players as player}
-				<li>{player.name}</li>
+				<li>{player.name} <button onclick={() => game.removePlayer(player.id)}>Delete</button></li>
 			{/each}
 		</ul>
 	{/if}
 
 	<div>
-		<button onclick={startGame} disabled={game.players.length < 2}>Start game!</button>
+		<a href="/game" onclick={startGame} class:ghosty={!gameCanStart}>Start game!</a>
 	</div>
 </div>
-
-<style>
-</style>

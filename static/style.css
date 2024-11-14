@@ -107,6 +107,10 @@
 		max-width: 36rem;
 		margin-inline: auto;
 	}
+
+	.ghosty {
+		opacity: 0.5;
+	}
 }
 
 @layer layout {

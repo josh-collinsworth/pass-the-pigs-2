@@ -1,14 +1,23 @@
 import type { Player } from '$lib/data/types'
+import { save } from '$lib/scripts/helpers'
 
-class GameState {
-	#players = $state<Player[]>([])
-
-	get players() {
-		return this.#players
+export const game = $state({
+	players: [] as Player[],
+	createNewPlayer(name: string) {
+		const newPlayer = {
+			id: crypto.randomUUID(),
+			name: name,
+			banked: 0,
+			rolled: 0
+		}
+		this.players = [...this.players, newPlayer]
+		this.syncStateToLocalStorage()
+	},
+	removePlayer(id: string) {
+		this.players = this.players.filter((player) => player.id !== id)
+		this.syncStateToLocalStorage()
+	},
+	syncStateToLocalStorage() {
+		save('game', this)
 	}
-	set players(players: Player[]) {
-		this.#players = players
-	}
-}
-
-export const game = new GameState()
+})
