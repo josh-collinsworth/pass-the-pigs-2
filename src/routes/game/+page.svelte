@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { game } from '$lib/state/index.svelte'
+	import { calculateScore } from '$lib/scripts/scoring'
+	import { basePositionScores } from '$lib/scripts/scoring'
 
-	let pigLeft = $state('')
-	let pigRight = $state('')
+	let pigLeft = $state<keyof typeof basePositionScores | undefined>()
+	let pigRight = $state<keyof typeof basePositionScores | undefined>()
+
+	const handleSubmit = (e: Event) => {
+		e.preventDefault()
+		const scoreToAdd = calculateScore(pigLeft, pigRight)
+		// TODO: add score to current player
+	}
 </script>
 
 <div class="container">
@@ -12,7 +20,7 @@
 		{/each}
 	</ul>
 
-	<form action="">
+	<form action="" onsubmit={handleSubmit}>
 		<div class="column">
 			<label for="sider_down_left">
 				<input
@@ -137,7 +145,13 @@
 				Leaning Jowler
 			</label>
 		</div>
+		<button type="submit">Submit</button>
 	</form>
+	<div class="button-bar">
+		<button>Double sider</button>
+		<button>Oinker</button>
+		<button>Bank</button>
+	</div>
 </div>
 
 <style>
@@ -145,11 +159,25 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
+
+		& button[type='submit'] {
+			grid-column: 1 / -1;
+		}
 	}
 
 	.column {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.button-bar {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 1rem;
+
+		button {
+			flex: 1 1 auto;
+		}
 	}
 </style>
