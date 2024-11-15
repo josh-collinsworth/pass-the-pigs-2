@@ -8,15 +8,48 @@
 
 	const handleSubmit = (e: Event) => {
 		e.preventDefault()
+		if (!pigLeft || !pigRight) return
+		const set = [pigLeft, pigRight]
+		if (set.includes('sider_down') && set.includes('sider_up')) {
+			handleOinker()
+			return
+		}
 		const scoreToAdd = calculateScore(pigLeft, pigRight)
-		// TODO: add score to current player
+		const { rolled } = game.getCurrentPlayer()
+		game.updateCurrentPlayer({ rolled: rolled + scoreToAdd })
+		resetPigs()
+	}
+
+	const handleOinker = () => {
+		game.updateCurrentPlayer({ rolled: 0 })
+		resetPigs()
+		game.goToNextPlayer()
+	}
+
+	const handleDoubleSider = () => {
+		game.updateCurrentPlayer({ rolled: game.getCurrentPlayer().rolled + 1 })
+		resetPigs()
+	}
+
+	const handleBank = () => {
+		const { rolled, banked } = game.getCurrentPlayer()
+		game.updateCurrentPlayer({ rolled: 0, banked: banked + rolled })
+		resetPigs()
+		game.goToNextPlayer()
+	}
+
+	const resetPigs = () => {
+		pigLeft = undefined
+		pigRight = undefined
 	}
 </script>
 
 <div class="container">
 	<ul>
 		{#each game.players as player, idx}
-			<li class:highlighted={idx === game.currentPlayer}>{player.name}</li>
+			<li class:highlighted={idx === game.currentPlayer}>
+				{player.name}, rolled: {player.rolled}, banked: {player.banked}
+			</li>
 		{/each}
 	</ul>
 
@@ -145,12 +178,12 @@
 				Leaning Jowler
 			</label>
 		</div>
-		<button type="submit">Submit</button>
+		<button type="submit" disabled={!pigLeft || !pigRight}>Submit roll</button>
 	</form>
 	<div class="button-bar">
-		<button>Double sider</button>
-		<button>Oinker</button>
-		<button>Bank</button>
+		<button onclick={handleDoubleSider}>Double sider</button>
+		<button onclick={handleOinker}>Oinker</button>
+		<button onclick={handleBank}>Bank</button>
 	</div>
 </div>
 
