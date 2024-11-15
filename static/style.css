@@ -111,6 +111,10 @@
 	.ghosty {
 		opacity: 0.5;
 	}
+
+	.highlighted {
+		background-color: yellow;
+	}
 }
 
 @layer layout {
