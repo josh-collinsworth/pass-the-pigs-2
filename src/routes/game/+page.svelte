@@ -2,6 +2,8 @@
 	import { game } from '$lib/state/index.svelte'
 	import { calculateScore } from '$lib/scripts/scoring'
 	import { basePositionScores } from '$lib/scripts/scoring'
+	import { save } from '$lib/scripts/helpers'
+	import { goto } from '$app/navigation'
 
 	let pigLeft = $state<keyof typeof basePositionScores | undefined>()
 	let pigRight = $state<keyof typeof basePositionScores | undefined>()
@@ -34,6 +36,13 @@
 	const handleBank = () => {
 		const { rolled, banked } = game.getCurrentPlayer()
 		game.updateCurrentPlayer({ rolled: 0, banked: banked + rolled })
+		if (game.getCurrentPlayer().banked >= 100 && !game.playersWhoHaveTakenFinalTurn.length) {
+			alert(
+				`${game.getCurrentPlayer().name} Has banked with ${game.getCurrentPlayer().banked} points! Every other player now gets one more turn.`
+			)
+			game.playersWhoHaveTakenFinalTurn.push(game.getCurrentPlayer().id)
+		}
+
 		resetPigs()
 		game.goToNextPlayer()
 	}
@@ -186,6 +195,15 @@
 		<button onclick={handleBank}>Bank</button>
 	</div>
 </div>
+{#if game.gameIsOver()}
+	<button
+		onclick={() => {
+			save('game', null)
+			game.players = []
+			goto('/')
+		}}>New Game</button
+	>
+{/if}
 
 <style>
 	form {

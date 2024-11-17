@@ -25,6 +25,13 @@ const createGameState = ({
 		players,
 		currentPlayer,
 		isLoading: true,
+		playersWhoHaveTakenFinalTurn: [] as string[],
+		isFinalTurn() {
+			return this.playersWhoHaveTakenFinalTurn.length
+		},
+		gameIsOver() {
+			return this.playersWhoHaveTakenFinalTurn.length === this.players.length
+		},
 		createNewPlayer(name: string) {
 			if (!name) return
 			const newPlayer = {
@@ -44,8 +51,22 @@ const createGameState = ({
 			save('game', this)
 		},
 		goToNextPlayer() {
+			if (
+				this.isFinalTurn() &&
+				!this.playersWhoHaveTakenFinalTurn.includes(this.getCurrentPlayer().id)
+			) {
+				this.playersWhoHaveTakenFinalTurn.push(this.getCurrentPlayer().id)
+			}
+			this.checkIsGameOver()
 			this.currentPlayer = (this.currentPlayer + 1) % this.players.length
 			this.cleanup()
+		},
+		checkIsGameOver() {
+			if (this.gameIsOver()) {
+				const winningPlayer = this.players.sort((a, b) => b.banked - a.banked)[0]
+				alert(`The game is over! ${winningPlayer.name} wins with ${winningPlayer.banked} points!`)
+			}
+			return
 		},
 		getCurrentPlayer() {
 			return this.players[this.currentPlayer]
