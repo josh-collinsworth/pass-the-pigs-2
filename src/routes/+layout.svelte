@@ -1,25 +1,34 @@
 <script>
 	import { goto } from '$app/navigation'
-	let { children } = $props()
+	let { children, data } = $props()
 	import { game } from '$lib/state/index.svelte'
 	import { onMount } from 'svelte'
+	import { circIn, circOut } from 'svelte/easing'
+	import { fly } from 'svelte/transition'
+
+	const slideY = 12
 
 	onMount(() => {
-		if (game.players.length >= 2) {
-			goto('/game')
-		} else if (window.location.href.includes('game')) {
-			goto('/')
-		}
 		game.isLoading = false
 	}) // Lets us be sure localStorage has had time to load
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="style.css" />
+	<link rel="stylesheet" href="/style.css" />
 </svelte:head>
 
-{#if !game.isLoading}
-	{@render children()}
-{:else}
-	<p>Loading...</p>
-{/if}
+<header style="height: var(--header-height); padding: 1rem;">
+	<a href="/">Home</a> | <a href="/game">Game</a> | <a href="/game/scoreboard">Scoreboard</a>
+</header>
+{#key data.path}
+	<div
+		in:fly={{ delay: 240, duration: 160, y: slideY, easing: circOut }}
+		out:fly={{ duration: 160, y: -slideY, easing: circIn }}
+	>
+		{#if !game.isLoading}
+			{@render children()}
+		{:else}
+			<p>Loading...</p>
+		{/if}
+	</div>
+{/key}

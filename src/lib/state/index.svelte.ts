@@ -3,34 +3,40 @@ import { load, save } from '$lib/scripts/helpers'
 
 const DEFAULT_GAME_STATE = {
 	players: [],
-	currentPlayer: 0
+	currentPlayerIndex: 0
 }
 
 let newGameArgs = DEFAULT_GAME_STATE
 const savedGame = load('game')
 
 if (savedGame) {
-	const { players, currentPlayer } = savedGame
-	newGameArgs = { players, currentPlayer }
+	const { players, currentPlayerIndex } = savedGame
+	newGameArgs = { players, currentPlayerIndex }
 }
 
 const createGameState = ({
 	players = [],
-	currentPlayer = 0
+	currentPlayerIndex = 0
 }: {
 	players: Player[]
-	currentPlayer: number
+	currentPlayerIndex: number
 }) => {
 	const gameState = $state({
 		players,
-		currentPlayer,
+		currentPlayerIndex,
 		isLoading: true,
 		playersWhoHaveTakenFinalTurn: [] as string[],
-		isFinalTurn() {
+		get isFinalTurn() {
 			return this.playersWhoHaveTakenFinalTurn.length
 		},
-		gameIsOver() {
+		get gameIsOver() {
 			return this.playersWhoHaveTakenFinalTurn.length === this.players.length
+		},
+		get currentlyWinningPlayer() {
+			return this.players.find(
+				(player: Player) =>
+					player.banked === Math.max(...this.players.map((player) => player.banked))
+			)
 		},
 		createNewPlayer(name: string) {
 			if (!name) return
@@ -51,34 +57,31 @@ const createGameState = ({
 			save('game', this)
 		},
 		goToNextPlayer() {
-			if (
-				this.isFinalTurn() &&
-				!this.playersWhoHaveTakenFinalTurn.includes(this.getCurrentPlayer().id)
-			) {
-				this.playersWhoHaveTakenFinalTurn.push(this.getCurrentPlayer().id)
+			if (this.isFinalTurn && !this.playersWhoHaveTakenFinalTurn.includes(this.currentPlayer.id)) {
+				this.playersWhoHaveTakenFinalTurn.push(this.currentPlayer.id)
 			}
 			this.checkIsGameOver()
-			this.currentPlayer = (this.currentPlayer + 1) % this.players.length
+			this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length
 			this.cleanup()
 		},
 		checkIsGameOver() {
-			if (this.gameIsOver()) {
-				const winningPlayer = this.players.sort((a, b) => b.banked - a.banked)[0]
+			if (this.gameIsOver) {
+				const winningPlayer = this.currentlyWinningPlayer
 				alert(`The game is over! ${winningPlayer.name} wins with ${winningPlayer.banked} points!`)
 			}
 			return
 		},
-		getCurrentPlayer() {
-			return this.players[this.currentPlayer]
+		get currentPlayer() {
+			return this.players[this.currentPlayerIndex]
 		},
-		getCurrentPlayerId() {
-			return this.players[this.currentPlayer].id
+		get currentPlayerId() {
+			return this.players[this.currentPlayerIndex].id
 		},
 		updateCurrentPlayer({ rolled, banked }: { rolled?: number; banked?: number }) {
 			const isNewRolled = typeof rolled === 'number'
 			const isNewBanked = typeof banked === 'number'
 			this.players = this.players.map((player) => {
-				if (player.id === this.getCurrentPlayerId()) {
+				if (player.id === this.currentPlayerId) {
 					return {
 						...player,
 						rolled: isNewRolled ? rolled : player.rolled,

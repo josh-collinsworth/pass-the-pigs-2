@@ -1,4 +1,4 @@
-@layer reset, utils, layout;
+@layer reset, base, utils, layout;
 
 @layer reset {
 	/* https://piccalil.li/blog/a-more-modern-css-reset/ */
@@ -101,11 +101,92 @@
 	}
 }
 
+@layer base {
+	:root {
+		--color-a: #9ac1f0;
+		--color-b: #72fa93;
+		--color-c: #a0e548;
+		--color-d: #e45f2b;
+		--color-e: #f6c445;
+		--header-height: 2rem;
+	}
+
+	@font-face {
+		font-family: 'Gazpacho';
+		src: url('/fonts/GazpachoMedium-subset.woff2') format('woff2');
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: 'Gazpacho';
+		src: url('/fonts/GazpachoMediumItalic-subset.woff2') format('woff2');
+		font-weight: normal;
+		font-style: italic;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: 'Gazpacho';
+		src: url('/fonts/GazpachoBlack-subset.woff2') format('woff2');
+		font-weight: bold;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	@font-face {
+		font-family: 'Gazpacho';
+		src: url('/fonts/GazpachoBlackItalic-subset.woff2') format('woff2');
+		font-weight: bold;
+		font-style: italic;
+		font-display: swap;
+	}
+
+	body {
+		font-family: 'Gazpacho', sans-serif;
+		background-color: color-mix(in oklch, var(--color-a) 20%, white);
+		color: color-mix(in oklch, var(--color-a) 30%, black);
+	}
+
+	button,
+	.button {
+		font-weight: bold;
+		padding: 0.5em;
+		font-size: inherit;
+		background-color: var(--color-a);
+		border: 1.5px solid color-mix(in oklch, var(--color-a) 90%, black);
+		border-radius: 0.25rem;
+		display: inline-block;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+
+		& tr td {
+			width: 100%;
+			padding-inline: 0.5em;
+			border-bottom: 1px solid;
+
+			&:last-of-type {
+				width: auto;
+			}
+		}
+	}
+}
+
 @layer utils {
 	.container {
 		width: 100%;
-		max-width: 36rem;
+		max-width: 24rem;
 		margin-inline: auto;
+		padding: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	.ghosty {
@@ -114,6 +195,17 @@
 
 	.highlighted {
 		background-color: yellow;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		border: 0;
 	}
 }
 

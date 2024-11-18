@@ -19,12 +19,12 @@
 </script>
 
 <div class="container">
-	<h1>Add players</h1>
+	<h1>New game</h1>
+	<h2>Add players</h2>
 	<form onsubmit={addNewPlayer}>
 		<div class="form-group">
-			<label for="name">Name</label>
-			<input type="text" id="name" bind:value={playerToAdd} />
-			{playerToAdd}
+			<label for="name" class="sr-only">Name</label>
+			<input type="text" id="name" bind:value={playerToAdd} placeholder="Name" />
 		</div>
 		<button type="submit">Add player</button>
 	</form>
@@ -32,14 +32,19 @@
 	{#if !game.players.length}
 		<p>(No players added yet)</p>
 	{:else}
-		<ul>
-			{#each game.players as player}
-				<li>{player.name} <button onclick={() => game.removePlayer(player.id)}>Delete</button></li>
-			{/each}
-		</ul>
+		<table>
+			<tbody>
+				{#each game.players as player}
+					<tr>
+						<td>{player.name}</td>
+						<td><button onclick={() => game.removePlayer(player.id)}>Delete</button></td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	{/if}
 
 	<div>
-		<a href="/game" onclick={startGame} class:ghosty={!gameCanStart}>Start game!</a>
+		<a href="/game" onclick={startGame} class="button" class:ghosty={!gameCanStart}>Start game!</a>
 	</div>
 </div>
